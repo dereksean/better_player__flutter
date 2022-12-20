@@ -61,8 +61,10 @@ class Constants {
   static const String IMAGE_PATH = "/storage/emulated/0/BetterExample/Image";
   static const String VIDEO_PATH = "/storage/emulated/0/BetterExample/Video";
 
+  static String baseUrl = 'https://vrssage.azurewebsites.net/api/v1/video';
+  //static String basePostUrl = 'https://vrssage.azurewebsites.net/api/v1/video/authenticate';
+  static String tokenEndpoint = '/authenticate';
 
 
-
-
+  static String videoListEndpoint = '/GetVideos';
 }

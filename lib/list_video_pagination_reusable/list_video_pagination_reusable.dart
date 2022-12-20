@@ -4,6 +4,9 @@ import 'package:better_player_example/list_video_pagination_reusable/reusable_vi
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../list_video_main_example/video_list_data.dart';
+import 'dart:convert';
+import '../services/api_service.dart';
+import '../model/videos_model.dart';
 
 class ListVideoPaginationReusablePage extends StatefulWidget {
   const ListVideoPaginationReusablePage({Key? key}) : super(key: key);
@@ -23,7 +26,7 @@ class _ListVideoPaginationReusablePageState extends State<ListVideoPaginationReu
   bool _hasNextPage = true;
   bool _isLoadMoreRunning = false;
 
-  List<HomeModel> _totalPosts = [];
+  List<Videos> _totalPosts = [];
 
   void _loadMore() async {
     if (_hasNextPage == true &&
@@ -39,10 +42,10 @@ class _ListVideoPaginationReusablePageState extends State<ListVideoPaginationReu
       _page += 1;
       // call data
       try {
-        List<HomeModel> nextPageList = [];
+        List<Videos> nextPageList = [];
         if (_totalPosts.length < 50) {
           // total amount 50
-          nextPageList = getList();
+          nextPageList = getVideos();
         }
 
         if (nextPageList.isNotEmpty) {
@@ -75,7 +78,7 @@ class _ListVideoPaginationReusablePageState extends State<ListVideoPaginationReu
     // call data
     try {
       setState(() {
-        _totalPosts = getList();
+        _totalPosts = getVideos();
       });
     } catch (err) {
       if (kDebugMode) {
@@ -177,8 +180,8 @@ class _ListVideoPaginationReusablePageState extends State<ListVideoPaginationReu
               controller: _scrollController,
               itemBuilder: (context, index) {
                 VideoListData videoListData = VideoListData(
-                    _totalPosts[index].title,
-                    _totalPosts[index].videoUrl);
+                    _totalPosts[index].videoId.toString(),
+                    _totalPosts[index].videoUrl.toString());
                 return ReusableVideoListWidget(
                     videoListData: videoListData,
                     videoListController: videoListController,
@@ -200,51 +203,67 @@ class _ListVideoPaginationReusablePageState extends State<ListVideoPaginationReu
 
   }
 
-  List<HomeModel> getList() {
-    List<HomeModel> list = [];
-    list.add(HomeModel(
-        "title1",
-        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
-        "Video"));
-    list.add(HomeModel(
-        "title2",
-        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_2MB.mp4",
-        "Video"));
-    list.add(HomeModel(
-        "title3",
-        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4",
-        "Video"));
-    list.add(HomeModel(
-        "title4",
-        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
-        "Video"));
-    list.add(HomeModel(
-        "title5",
-        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_2MB.mp4",
-        "Video"));
-    list.add(HomeModel(
-        "title6",
-        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4",
-        "Video"));
-    list.add(HomeModel(
-        "title7",
-        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
-        "Video"));
-    list.add(HomeModel(
-        "title8",
-        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_2MB.mp4",
-        "Video"));
-    list.add(HomeModel(
-        "title9",
-        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4",
-        "Video"));
-    list.add(HomeModel(
-        "title10",
-        "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
-        "Video"));
+  List<Videos> getVideos() {
+    List<Videos> list = [];
+    // list.add(HomeModel(
+    //     "title1",
+    //     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
+    //     "Video"));
+    // list.add(HomeModel(
+    //     "title2",
+    //     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_2MB.mp4",
+    //     "Video"));
+    // list.add(HomeModel(
+    //     "title3",
+    //     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4",
+    //     "Video"));
+    // list.add(HomeModel(
+    //     "title4",
+    //     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
+    //     "Video"));
+    // list.add(HomeModel(
+    //     "title5",
+    //     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_2MB.mp4",
+    //     "Video"));
+    // list.add(HomeModel(
+    //     "title6",
+    //     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4",
+    //     "Video"));
+    // list.add(HomeModel(
+    //     "title7",
+    //     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
+    //     "Video"));
+    // list.add(HomeModel(
+    //     "title8",
+    //     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_2MB.mp4",
+    //     "Video"));
+    // list.add(HomeModel(
+    //     "title9",
+    //     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4",
+    //     "Video"));
+    // list.add(HomeModel(
+    //     "title10",
+    //     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
+    //     "Video"));
 
     return list;
   }
+
+  //String jsonString = videoModelFromJson.toString();
+
+
+
+
+  // List<Videos> getList2() {
+  //   List<Videos> list = [];
+  //   Map<String, dynamic> jsonObject = jsonDecode(jsonString);
+  //   List<Map<String, dynamic>> videos = jsonObject['videos'];
+  //
+  //   for (Map<String, dynamic> video in videos) {
+  //     print('ID: ${video['id']}, Name: ${video['name']}');
+  //   }
+  //   return list;
+  // }
 
   bool _checkCanBuildVideo() {
     return _canBuildVideo;

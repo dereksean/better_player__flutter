@@ -30,6 +30,8 @@ class _VideoItemState extends State<VideoItem> {
     super.initState();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -56,7 +58,7 @@ class _VideoItemState extends State<VideoItem> {
               : Container(
                   height: 250,
                   width: size.width,
-                  color: Colors.green,
+                  color: Colors.black,
                   child: const Center(
                       child: Icon(
                     Icons.play_circle,
@@ -92,6 +94,8 @@ class _VideoItemState extends State<VideoItem> {
       ),
     );
   }
+
+
 
 
 

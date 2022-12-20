@@ -2,17 +2,19 @@ import 'package:better_player/better_player.dart';
 import 'package:better_player_example/list_video_main_example/video_list_data.dart';
 import 'package:flutter/material.dart';
 
-class VideoListWidget extends StatefulWidget {
-  final VideoListData? videoListData;
+import '../model/videos_model.dart';
 
-  const VideoListWidget({Key? key, this.videoListData}) : super(key: key);
+class VideoListWidget extends StatefulWidget {
+  final Videos? videos;
+
+  const VideoListWidget({Key? key, this.videos}) : super(key: key);
 
   @override
   _VideoListWidgetState createState() => _VideoListWidgetState();
 }
 
 class _VideoListWidgetState extends State<VideoListWidget> {
-  VideoListData? get videoListData => widget.videoListData;
+  Videos? get videos => widget.videos;
   BetterPlayerConfiguration? betterPlayerConfiguration;
   BetterPlayerListVideoPlayerController? controller;
 
@@ -26,6 +28,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
   @override
   void dispose() {
     super.dispose();
+
   }
 
   @override
@@ -38,7 +41,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
           Padding(
             padding: const EdgeInsets.all(8),
             child: Text(
-              videoListData!.videoTitle,
+              videos!.videoTitle.toString(),
               style: const TextStyle(fontSize: 50),
             ),
           ),
@@ -47,7 +50,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
               child:BetterPlayerListVideoPlayer(
                 BetterPlayerDataSource(
                   BetterPlayerDataSourceType.network,
-                  videoListData!.videoUrl,
+                  videos!.videoUrl.toString(),
                   // notificationConfiguration:
                   // BetterPlayerNotificationConfiguration(
                   //     showNotification: false,
@@ -64,7 +67,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                     autoPlay: false, aspectRatio: 1, handleLifecycle: true),
                 //key: Key(videoListData.hashCode.toString()),
                 // playFraction: 0.8,
-                playFraction: 0.9,
+                //playFraction: 0.9,
                 betterPlayerListVideoPlayerController: controller,
               )),
           // const Padding(
