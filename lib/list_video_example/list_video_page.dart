@@ -248,7 +248,7 @@ Future<void> _checkVideoAlreadySaved() async {
     bool alreadySavedInDevice =
         await MediaSaver().isVideoAlreadySavedInDevice("https://vrssagestorage.blob.core.windows.net/fileupload/desert.mp4");
 
-    String path = "/storage/self/primary/Download";
+    String path = "/storage/self/primary";
     if (alreadySavedInDevice) {
       path = await MediaSaver().getVideoDevicePath("https://vrssagestorage.blob.core.windows.net/fileupload/desert.mp4");
     }
