@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:better_player/better_player.dart';
 import 'package:better_player_example/list_video_example/image_item.dart';
 import 'package:better_player_example/list_video_example/model.dart';
@@ -5,6 +7,8 @@ import 'package:better_player_example/list_video_example/video_item.dart';
 import 'package:flutter/material.dart';
 import 'package:better_player_example/model/videos_model.dart';
 import 'package:better_player_example/services/api_service.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../media_saver.dart';
 import '../services/apiResponse.dart';
@@ -19,10 +23,11 @@ class ListPlayerPage extends StatefulWidget {
 
 class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAliveClientMixin<ListPlayerPage>  {
   //List<Model> list = [];
-   List<Videos>? _videos = [];
+  List<Videos>? _videos = [];
+  final List<String> _videoUrls = [];
   late BetterPlayerController betterPlayerController;
-   //late BetterPlayerConfiguration betterPlayerConfiguration;
-   bool _isDisposing = false;
+  //late BetterPlayerConfiguration betterPlayerConfiguration;
+  bool _isDisposing = false;
   String videoPath = "";
 
   bool sourceChecked = false;
@@ -39,29 +44,29 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
 
     //setUpList();
 
-    _checkVideoAlreadySaved();
-    saveVideoInGallery();
+
+
     //_setupController("https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4");
-     _setupController("");
+    _setupController("");
 
     //_setupData();
     onVisibilityChanged(100);
   }
 
-   @override
-   void dispose() {
-     // if (betterPlayerController.isPlaying() == true) betterPlayerController.pause();
-     // betterPlayerController.removeEventsListener((p0) => null);
-     // betterPlayerController.videoPlayerController == null;
-     // _isDisposing = true;
-     if (betterPlayerController.videoPlayerController != null) {
-       betterPlayerController!.dispose(forceDispose: true);
-       //betterPlayerController.videoPlayerController = null;
-       print("Disposed controller from Framework.");
-     }
-     super.dispose();
+  @override
+  void dispose() {
+    // if (betterPlayerController.isPlaying() == true) betterPlayerController.pause();
+    // betterPlayerController.removeEventsListener((p0) => null);
+    // betterPlayerController.videoPlayerController == null;
+    // _isDisposing = true;
+    if (betterPlayerController.videoPlayerController != null) {
+      betterPlayerController!.dispose(forceDispose: true);
+      //betterPlayerController.videoPlayerController = null;
+      //print("Disposed controller from Framework.");
+    }
+    super.dispose();
 
-   }
+  }
 
   void _getData() async {
     await ApiService().authorizeUser();
@@ -70,60 +75,80 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
     Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
     List<Videos> videos = ApiService().videos;
 
+    // for (var videoUrl in _videos!) {
+    //   //_saveAssetVideoToFile(videoUrl.videoUrl.toString());
+    //   _checkVideoAlreadySaved(videoUrl.videoUrl.toString());
+    //   saveVideoInGallery(videoUrl.videoUrl.toString());
+    // }
+
 
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    Size size = MediaQuery
+        .of(context)
+        .size;
 
 
+    // return Scaffold(
+    //     body: Container(
+    //
+    //         padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
+    //         height: size.height,
+    //         width: size.width,
 
-    return Scaffold(
-        body: Container(
+    return ListView.builder(
+        shrinkWrap: true,
+        itemCount: _videos?.length,
+        itemBuilder: (context, index) {
 
-      padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
-      height: size.height,
-      width: size.width,
+          return Card(
+              margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(
+                        _videos![index].videoTitle.toString(),
+                        style: const TextStyle(fontSize: 25),
+                      ),
+                    ),
+                    // list[index].type == "image"
+                    //      ? ImageItem(
+                    //          imageUrl: list[index].imageUrl,
+                    //          description: list[index].description)
+                    GestureDetector(
+                      child: VideoItem(
+                          canBuild: selectedVideoIndex == index ? true : false,
+                          betterPlayerController: betterPlayerController,
+                          description: _videos![index].videoTitle.toString(),
+                          videoUrl: _videos![index].videoUrl.toString()),
+                      onTap: () {
+                        // if(selectedVideoIndex==-1||(betterPlayerController.isVideoInitialized()??false) ) {
 
-      child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: _videos?.length,
-          itemBuilder: (context, index) =>
-           // list[index].type == "image"
-           //      ? ImageItem(
-           //          imageUrl: list[index].imageUrl,
-           //          description: list[index].description)
-                 GestureDetector(
-                    child: VideoItem(
-                        canBuild: selectedVideoIndex == index ? true : false,
-                        betterPlayerController: betterPlayerController,
-                        description: _videos![index].videoTitle.toString(),
-                        videoUrl: _videos![index].videoUrl.toString()),
-                    onTap: () {
-                      // if(selectedVideoIndex==-1||(betterPlayerController.isVideoInitialized()??false) ) {
-
-                      setState(() {
-
-                        value++;
-                        selectedVideoIndex = index;
-
-
-                        _setupController(_videos![index].videoUrl.toString());
-                        //_freeController();
-
-                      });
-
-                      betterPlayerController.videoPlayerController!.addListener(checkVideo);
-                      checkVideo();
-
-                      // }
-                    },
-          ),
+                        setState(() {
+                          value++;
+                          selectedVideoIndex = index;
 
 
-      // ),
-    )));
+                          _setupController(_videos![index].videoUrl.toString());
+                          //_freeController();
+
+                        });
+
+                        betterPlayerController.videoPlayerController!.addListener(
+                            checkVideo);
+                        checkVideo();
+
+                        // }
+                      },
+                    ),
+
+
+                    // ),
+                  ]));});
   }
 
 //   //******************************Getting data from an API******************************//
@@ -179,38 +204,38 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
   void _setupController(String videoUrl) {
 
     BetterPlayerConfiguration betterPlayerConfiguration =
-        BetterPlayerConfiguration(
+    BetterPlayerConfiguration(
 
-            // aspectRatio: 16 / 9,
-            aspectRatio: 1,
-            fit: BoxFit.fill,
-            handleLifecycle: true,
-            autoDispose: true,
-            autoPlay: true,
-            fullScreenByDefault: true,
+      // aspectRatio: 16 / 9,
+        aspectRatio: 1,
+        fit: BoxFit.fill,
+        handleLifecycle: true,
+        autoDispose: true,
+        autoPlay: true,
+        fullScreenByDefault: true,
 
-            showPlaceholderUntilPlay: true,
-            looping: false,
-            controlsConfiguration: BetterPlayerControlsConfiguration(
-                controlBarColor: Colors.black.withAlpha(600),
-                controlBarHeight: 30,
-                overflowModalColor: Colors.yellow,
-                overflowModalTextColor: Colors.white,
-                overflowMenuIconsColor: Colors.white,
-                enableSkips: false,
-                // playIcon: const AssetImage("assets/images/play_icon.png"),
-                enablePlayPause: true));
+        showPlaceholderUntilPlay: true,
+        looping: false,
+        controlsConfiguration: BetterPlayerControlsConfiguration(
+            controlBarColor: Colors.black.withAlpha(600),
+            controlBarHeight: 30,
+            overflowModalColor: Colors.yellow,
+            overflowModalTextColor: Colors.white,
+            overflowMenuIconsColor: Colors.white,
+            enableSkips: false,
+            // playIcon: const AssetImage("assets/images/play_icon.png"),
+            enablePlayPause: true));
 
     // // check if video already downloaded  play video from path or else play from network
     BetterPlayerDataSource? _betterPlayerDataSource = videoPath == ""
         ? BetterPlayerDataSource(BetterPlayerDataSourceType.network, videoUrl,
-            // placeholder: _buildVideoPlaceholder(videoModelItem.cover),
-            cacheConfiguration:
-                const BetterPlayerCacheConfiguration(useCache: true))
-        : BetterPlayerDataSource(BetterPlayerDataSourceType.file, videoPath,
-            // placeholder: _buildVideoPlaceholder(videoModelItem.cover),
-            cacheConfiguration:
-                const BetterPlayerCacheConfiguration(useCache: true));
+        // placeholder: _buildVideoPlaceholder(videoModelItem.cover),
+        cacheConfiguration:
+        const BetterPlayerCacheConfiguration(useCache: true))
+        : BetterPlayerDataSource(BetterPlayerDataSourceType.file, videoUrl,
+        // placeholder: _buildVideoPlaceholder(videoModelItem.cover),
+        cacheConfiguration:
+        const BetterPlayerCacheConfiguration(useCache: true));
 
     betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     betterPlayerController.setupDataSource(_betterPlayerDataSource);
@@ -234,23 +259,26 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
       //print('video Ended');
     }
 
-    if(betterPlayerController.betterPlayerConfiguration.autoDispose == true && (betterPlayerController.isVideoInitialized()??false)) {
-      //betterPlayerController.videoPlayerController = null;
-      print('Flammed');
-    }
+    // if(betterPlayerController.betterPlayerConfiguration.autoDispose == true && (betterPlayerController.isVideoInitialized()??false)) {
+    //   //betterPlayerController.videoPlayerController = null;
+    //   print('Flammed');
+    // }
 
   }
 
 
 
 
-Future<void> _checkVideoAlreadySaved() async {
+  Future<void> _checkVideoAlreadySaved(String videoUrl) async {
     bool alreadySavedInDevice =
-        await MediaSaver().isVideoAlreadySavedInDevice("https://vrssagestorage.blob.core.windows.net/fileupload/desert.mp4");
+    await MediaSaver().isVideoAlreadySavedInDevice(videoUrl);
 
     String path = "/storage/self/primary";
     if (alreadySavedInDevice) {
-      path = await MediaSaver().getVideoDevicePath("https://vrssagestorage.blob.core.windows.net/fileupload/desert.mp4");
+      path = await MediaSaver().getVideoDevicePath(videoUrl);
+      videoPath = path;
+      _videoUrls?.add(videoPath);
+      //_setupFilePathList();
     }
 
     // setState(() {
@@ -260,15 +288,15 @@ Future<void> _checkVideoAlreadySaved() async {
     //_setupController("https://vrssagestorage.blob.core.windows.net/fileupload/desert.mp4");
   }
 
-  Future<void> saveVideoInGallery() async {
+  Future<void> saveVideoInGallery(String videoUrl) async {
     bool isVideoAlreadySavedInDevice =
-        await MediaSaver().isVideoAlreadySavedInDevice("https://vrssagestorage.blob.core.windows.net/fileupload/desert.mp4");
+    await MediaSaver().isVideoAlreadySavedInDevice(videoUrl);
 
     if (!isVideoAlreadySavedInDevice) {
       // save Image to device
       if (!mounted) return;
       bool savedSuccessfully =
-          await MediaSaver().saveVideoInDevice("https://vrssagestorage.blob.core.windows.net/fileupload/desert.mp4", context);
+      await MediaSaver().saveVideoInDevice(videoUrl, context);
       if (savedSuccessfully) {
         if (!mounted) return;
         GlobalSnackBar.show(context, "video downloaded");
@@ -278,6 +306,15 @@ Future<void> _checkVideoAlreadySaved() async {
       GlobalSnackBar.show(context, "video already downloaded");
     }
   }
+
+  // ///Save video to file, so we can use it later
+  // Future _saveAssetVideoToFile(String videoUrl) async {
+  //   var content = await rootBundle.load("/storage/self/primary/");
+  //   final directory = await getApplicationDocumentsDirectory();
+  //   var file = File("${directory.path}/" + videoUrl);
+  //
+  //   file.writeAsBytesSync(content.buffer.asUint8List());
+  // }
 
   // void onVisibilityChanged(double visibleFraction) async {
   //   final bool? isPlaying = betterPlayerController!.isPlaying();
@@ -308,10 +345,19 @@ Future<void> _checkVideoAlreadySaved() async {
 
     //ApiResponse apiResponse = ApiResponse(videoList: []);
     //for (int index = 0; index < 10; index++) {
-      //var randomVideoUrl = _videos[_random.nextInt(_videos.length)];
-      //dataList.add(Videos("Video $index", randomVideoUrl));
-      _videos?.add(_videos![0]);
-    }
+    //var randomVideoUrl = _videos[_random.nextInt(_videos.length)];
+    //dataList.add(Videos("Video $index", randomVideoUrl));
+    _videos?.add(_videos![0]);
+  }
+
+  void _setupFilePathList() {
+
+    //ApiResponse apiResponse = ApiResponse(videoList: []);
+    //for (int index = 0; index < 10; index++) {
+    //var randomVideoUrl = _videos[_random.nextInt(_videos.length)];
+    //dataList.add(Videos("Video $index", randomVideoUrl));
+    _videoUrls?.add(videoPath![0]);
+  }
 
   void onVisibilityChanged(double fraction) {
     //print("Fraction is : $fraction");
@@ -341,5 +387,5 @@ Future<void> _checkVideoAlreadySaved() async {
   @override
   bool get wantKeepAlive => true;
 
-  }
+}
 

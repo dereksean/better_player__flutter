@@ -11,17 +11,17 @@ class VideoItem extends StatefulWidget {
 
   VideoItem(
       {Key? key,
-      required this.canBuild,
-      required this.betterPlayerController,
-      required this.description,
-      required this.videoUrl})
+        required this.canBuild,
+        required this.betterPlayerController,
+        required this.description,
+        required this.videoUrl})
       : super(key: key);
 
   @override
   State<VideoItem> createState() => _VideoItemState();
 }
 
-class _VideoItemState extends State<VideoItem> {
+class _VideoItemState extends State<VideoItem> with AutomaticKeepAliveClientMixin {
 
 
 
@@ -34,9 +34,11 @@ class _VideoItemState extends State<VideoItem> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     Size size = MediaQuery.of(context).size;
     var a = 0;
-    return Container(
+    return SizedBox(
       // padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
       height: 250,
       width: size.width,
@@ -44,28 +46,31 @@ class _VideoItemState extends State<VideoItem> {
         children: [
 
           widget.canBuild
-              ? Container(
+              ? SizedBox(
             height: 250,
             width: size.width,
-                child: AspectRatio(
-                    // aspectRatio: 16 / 9,
-                    // aspectRatio: 360 / 243,
-                    aspectRatio: 1,
-                    child: BetterPlayer(
-                      controller: widget.betterPlayerController,
-                    )),
-              )
+            child: AspectRatio(
+              // aspectRatio: 16 / 9,
+              // aspectRatio: 360 / 243,
+                aspectRatio: 1,
+                child: BetterPlayer(
+                  controller: widget.betterPlayerController,
+                )),
+          )
               : Container(
-                  height: 250,
-                  width: size.width,
-                  color: Colors.black,
-                  child: const Center(
-                      child: Icon(
-                    Icons.play_circle,
-                    color: Colors.red,
-                        size: 60,
-                  )),
-                ),
+            height: 250,
+            //margin: EdgeInsets.only(top: 15, bottom: 15),
+            width: size.width,
+            color: Colors.black87,
+            child: const Center(
+                child:
+                Icon(
+                  Icons.play_circle,
+                  color: Colors.red,
+                  size: 60,
+                )
+            ),
+          ),
           // Align(
           //   alignment: Alignment.bottomCenter,
           //   child: Container(
@@ -98,5 +103,7 @@ class _VideoItemState extends State<VideoItem> {
 
 
 
-
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
