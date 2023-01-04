@@ -33,7 +33,7 @@ class MediaSaver{
       await GallerySaver.saveImage(profilePicUrl);
       return true;
     }catch(e){
-       return false;
+      return false;
     }
   }
 
@@ -62,7 +62,8 @@ class MediaSaver{
 
   Future<bool> isVideoAlreadySavedInDevice(String videoUrl) async {
     var videoName = videoUrl.substring(videoUrl.lastIndexOf('/') + 1);
-    final path= Constants.VIDEO_PATH+"/"+ videoName;
+    var dir = await getApplicationDocumentsDirectory();
+    final path= "${dir.path}/$videoName";
 
     // bool directoryExists = await Directory(path).exists();
     bool fileExists = await File(path).exists();
@@ -73,10 +74,18 @@ class MediaSaver{
   }
 
   Future<bool> saveVideoInDevice(String videoUrl, BuildContext context) async{
+
     var videoName = videoUrl.substring(videoUrl.lastIndexOf('/') + 1);
-    final path= Constants.VIDEO_PATH+"/"+ videoName;
+    var dir = await getApplicationDocumentsDirectory();
+    final path= "${dir.path}/$videoName";
     try{
-      await Dio().download(videoUrl, path);
+      //var progress = Progress();
+      await Dio().download(videoUrl, path, onReceiveProgress: (received, total) {
+        if (total != -1) {
+          //var progressNotifier = ("${(received / total * 100).toStringAsFixed(0)}%");
+          //print(progressNotifier);
+        }
+      });
       await GallerySaver.saveVideo(videoUrl);
       return true;
     }catch(e){
@@ -115,7 +124,8 @@ class MediaSaver{
 
   Future<String> getVideoDevicePath(String videoUrl) async {
     var videoName = videoUrl.substring(videoUrl.lastIndexOf('/') + 1);
-    final path= Constants.VIDEO_PATH+"/"+ videoName;
+    var dir = await getApplicationDocumentsDirectory();
+    final path= "${dir.path}/$videoName";
 
     final directory= Directory(Constants.VIDEO_PATH);
 
@@ -134,16 +144,16 @@ class MediaSaver{
 
 
 
-  // Future<String> getVideoDevicePath(String videoUrl) async {
-  //   var videoName = videoUrl.substring(videoUrl.lastIndexOf('/') + 1);
-  //   final directory = Directory(Constants.VIDEO_PATH);
-  //   return "${directory.path}/$videoName";
-  // }
+// Future<String> getVideoDevicePath(String videoUrl) async {
+//   var videoName = videoUrl.substring(videoUrl.lastIndexOf('/') + 1);
+//   final directory = Directory(Constants.VIDEO_PATH);
+//   return "${directory.path}/$videoName";
+// }
 
 
 
-    // final directory = await getApplicationDocumentsDirectory();
-    // return "${directory.path}/$fileName";
+// final directory = await getApplicationDocumentsDirectory();
+// return "${directory.path}/$fileName";
 
 
 

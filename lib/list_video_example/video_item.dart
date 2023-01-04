@@ -14,7 +14,8 @@ class VideoItem extends StatefulWidget {
         required this.canBuild,
         required this.betterPlayerController,
         required this.description,
-        required this.videoUrl})
+        required this.videoUrl
+      })
       : super(key: key);
 
   @override
@@ -38,6 +39,12 @@ class _VideoItemState extends State<VideoItem> with AutomaticKeepAliveClientMixi
 
     Size size = MediaQuery.of(context).size;
     var a = 0;
+    appBar: AppBar(
+      title: Container(
+        ///height: 100,
+        child: Image.asset('lib/assets/images/vrssagelogomain.png', fit: BoxFit.contain,height: 50),
+      ),
+    );
     return SizedBox(
       // padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
       height: 250,
@@ -62,13 +69,14 @@ class _VideoItemState extends State<VideoItem> with AutomaticKeepAliveClientMixi
             //margin: EdgeInsets.only(top: 15, bottom: 15),
             width: size.width,
             color: Colors.black87,
-            child: const Center(
+            child:  Center(
                 child:
-                Icon(
-                  Icons.play_circle,
-                  color: Colors.red,
-                  size: 60,
-                )
+                Image.asset('lib/assets/images/vrssagelogomain.png', fit: BoxFit.contain,height: 50),
+                // Icon(
+                //   Icons.play_circle,
+                //   color: Colors.red,
+                //   size: 60,
+                // )
             ),
           ),
           // Align(

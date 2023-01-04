@@ -157,7 +157,7 @@ class BetterPlayerConfiguration {
     this.autoDetectFullscreenDeviceOrientation = false,
     this.autoDetectFullscreenAspectRatio = false,
     this.handleLifecycle = true,
-    this.autoDispose = true,
+    this.autoDispose = false,
     this.expandToFill = true,
     this.useRootNavigator = false,
   });

@@ -4,9 +4,12 @@ import 'package:better_player/better_player.dart';
 import 'package:better_player_example/list_video_example/image_item.dart';
 import 'package:better_player_example/list_video_example/model.dart';
 import 'package:better_player_example/list_video_example/video_item.dart';
+import 'package:dio/dio.dart';
+//import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:better_player_example/model/videos_model.dart';
 import 'package:better_player_example/services/api_service.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -24,7 +27,7 @@ class ListPlayerPage extends StatefulWidget {
 class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAliveClientMixin<ListPlayerPage>  {
   //List<Model> list = [];
   List<Videos>? _videos = [];
-  final List<String> _videoUrls = [];
+  List<String> _videoUrls = [];
   late BetterPlayerController betterPlayerController;
   //late BetterPlayerConfiguration betterPlayerConfiguration;
   bool _isDisposing = false;
@@ -40,18 +43,42 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
 
     // betterPlayerController = BetterPlayerController(BetterPlayerConfiguration());
     super.initState();
-    _getData();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
 
+      _ifLoaded();
+    });
+
+
+  }
+
+  _ifLoaded() async {
+  if (await Permission.storage.request().isGranted) {
+    _getData();
+    //buck();
     //setUpList();
 
 
 
     //_setupController("https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4");
-    _setupController("");
+    _setupController(videoPath);
+
 
     //_setupData();
     onVisibilityChanged(100);
-  }
+  }}
+
+
+  // void buck() async {// for android Directory
+  //   Directory appDocDir = await getApplicationDocumentsDirectory();
+  //
+  //   var result = await FilesystemPicker.open(allowedExtensions: [".png", ".jpg", ".mp4"],
+  //       context: context,rootDirectory: appDocDir);
+  //   if (result != null) {
+  //     File file = File(result);
+  //     print(file.parent.path);// the path where the file is saved
+  //     videoPath = file.parent.path;
+  //
+  //   }}
 
   @override
   void dispose() {
@@ -68,19 +95,26 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
 
   }
 
+
+
   void _getData() async {
+
+
+
     await ApiService().authorizeUser();
     //Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
     _videos = (await ApiService().getVideos());
     Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
     List<Videos> videos = ApiService().videos;
 
-    // for (var videoUrl in _videos!) {
-    //   //_saveAssetVideoToFile(videoUrl.videoUrl.toString());
-    //   _checkVideoAlreadySaved(videoUrl.videoUrl.toString());
-    //   saveVideoInGallery(videoUrl.videoUrl.toString());
-    // }
+    for (var videoUrl in _videos!) {
 
+      //_saveAssetVideoToFile(videoUrl.videoUrl.toString());
+      _checkVideoAlreadySaved(videoUrl.videoUrl.toString());
+
+
+    }
+    //saveVideo();
 
   }
 
@@ -98,7 +132,14 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
     //         height: size.height,
     //         width: size.width,
 
-    return ListView.builder(
+    return  Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: Image.asset('lib/assets/images/vrssagelogomain.png', fit: BoxFit.contain,height: 50),
+        ),
+        body: ListView.builder(
+        padding: const EdgeInsets.only(top: 10.0),
         shrinkWrap: true,
         itemCount: _videos?.length,
         itemBuilder: (context, index) {
@@ -124,7 +165,7 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
                           canBuild: selectedVideoIndex == index ? true : false,
                           betterPlayerController: betterPlayerController,
                           description: _videos![index].videoTitle.toString(),
-                          videoUrl: _videos![index].videoUrl.toString()),
+                          videoUrl: _videoUrls![index].toString()),
                       onTap: () {
                         // if(selectedVideoIndex==-1||(betterPlayerController.isVideoInitialized()??false) ) {
 
@@ -133,7 +174,7 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
                           selectedVideoIndex = index;
 
 
-                          _setupController(_videos![index].videoUrl.toString());
+                          _setupController(_videoUrls![index].toString());
                           //_freeController();
 
                         });
@@ -142,13 +183,14 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
                             checkVideo);
                         checkVideo();
 
+
                         // }
                       },
                     ),
 
 
                     // ),
-                  ]));});
+                  ]));}));
   }
 
 //   //******************************Getting data from an API******************************//
@@ -245,6 +287,13 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
     return Image.network(cover, fit: BoxFit.cover);
   }
 
+  void saveVideo()  {
+
+    for (var videoUrl in _videos!) {
+       saveVideoInGallery(videoUrl.videoUrl.toString());
+    }
+  }
+
   void checkVideo(){
     // Implement your calls inside these conditions' bodies :
     // if(betterPlayerController.videoPlayerController?.value.position == const Duration(seconds: 0, minutes: 0, hours: 0)) {
@@ -264,22 +313,30 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
     //   print('Flammed');
     // }
 
+
   }
 
 
 
 
-  Future<void> _checkVideoAlreadySaved(String videoUrl) async {
+  Future<List<String>> _checkVideoAlreadySaved(String videoUrl) async {
     bool alreadySavedInDevice =
     await MediaSaver().isVideoAlreadySavedInDevice(videoUrl);
-
-    String path = "/storage/self/primary";
+    var videoName = videoUrl.substring(videoUrl.lastIndexOf('/') + 1);
+    var dir = await getApplicationDocumentsDirectory();
+    String path= "${dir.path}/$videoName";
     if (alreadySavedInDevice) {
       path = await MediaSaver().getVideoDevicePath(videoUrl);
       videoPath = path;
+      sourceChecked = true;
       _videoUrls?.add(videoPath);
       //_setupFilePathList();
+      return _videoUrls;
     }
+    _videoUrls?.add(videoUrl);
+
+    return _videoUrls;
+
 
     // setState(() {
     //   videoPath = path;
@@ -297,24 +354,35 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
       if (!mounted) return;
       bool savedSuccessfully =
       await MediaSaver().saveVideoInDevice(videoUrl, context);
-      if (savedSuccessfully) {
-        if (!mounted) return;
-        GlobalSnackBar.show(context, "video downloaded");
-      }
-    } else {
-      if (!mounted) return;
-      GlobalSnackBar.show(context, "video already downloaded");
-    }
+    //   if (savedSuccessfully) {
+    //   if (!mounted) return;
+    //   GlobalSnackBar.show(context, "video downloaded");
+    // }
+  }
+  //   else {
+  // if (!mounted) return;
+  // GlobalSnackBar.show(context, "video already downloaded");
+  // }
   }
 
   // ///Save video to file, so we can use it later
   // Future _saveAssetVideoToFile(String videoUrl) async {
-  //   var content = await rootBundle.load("/storage/self/primary/");
+  //   //var content = await rootBundle.load("/storage/self/primary/");
+  //   var videoName = videoUrl.substring(videoUrl.lastIndexOf('/') + 1);
   //   final directory = await getApplicationDocumentsDirectory();
-  //   var file = File("${directory.path}/" + videoUrl);
-  //
-  //   file.writeAsBytesSync(content.buffer.asUint8List());
+  //   var file = File("${directory.path}/$videoName");
+  //   Uint8List bytes = file.readAsBytesSync();
+  //   file.writeAsBytesSync(bytes.buffer.asUint8List());
+  //   //_setupController(file.path);
+  //   //return ByteData.view(bytes.buffer);
+  //   //file.writeAsBytesSync(content.buffer.asUint8List());
   // }
+
+  Future<void> writeToFile(ByteData data, String path) {
+    final buffer = data.buffer;
+    return  File(path).writeAsBytes(
+        buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
+  }
 
   // void onVisibilityChanged(double visibleFraction) async {
   //   final bool? isPlaying = betterPlayerController!.isPlaying();
@@ -383,6 +451,8 @@ class _ListPlayerPageState extends State<ListPlayerPage> with AutomaticKeepAlive
           controller!.play();
         }
       }*/}}
+
+
 
   @override
   bool get wantKeepAlive => true;

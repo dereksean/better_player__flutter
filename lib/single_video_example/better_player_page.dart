@@ -52,7 +52,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
               ),
 
             ElevatedButton(onPressed: (){
-                 saveVideoInGallery();
+                 //saveVideoInGallery();
             }, child: Text("save movie ion gallery"))
           ],
         ),
@@ -168,22 +168,22 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   }
 
-  Future<void> saveVideoInGallery() async {
-
-    bool isVideoAlreadySavedInDevice = await MediaSaver().isVideoAlreadySavedInDevice(videoUrl);
-
-    if (!isVideoAlreadySavedInDevice) {
-      // save Image to device
-      if (!mounted) return;
-      bool savedSuccessfully = await MediaSaver().saveVideoInDevice(videoUrl, context);
-      if (savedSuccessfully) {
-        if (!mounted) return;
-        GlobalSnackBar.show(context, "video downloaded");
-      }
-    } else {
-      if (!mounted) return;
-      GlobalSnackBar.show(context, "video already downloaded");
-    }
-  }
+  // Future<void> saveVideoInGallery() async {
+  //
+  //   bool isVideoAlreadySavedInDevice = await MediaSaver().isVideoAlreadySavedInDevice(videoUrl);
+  //
+  //   if (!isVideoAlreadySavedInDevice) {
+  //     // save Image to device
+  //     if (!mounted) return;
+  //     bool savedSuccessfully = await MediaSaver().saveVideoInDevice(videoUrl, context);
+  //     if (savedSuccessfully) {
+  //       if (!mounted) return;
+  //       GlobalSnackBar.show(context, "video downloaded");
+  //     }
+  //   } else {
+  //     if (!mounted) return;
+  //     GlobalSnackBar.show(context, "video already downloaded");
+  //   }
+  // }
 
 }
