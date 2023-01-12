@@ -1,9 +1,16 @@
-import 'package:better_player_example/splash.dart';
+import 'package:VRssage/splash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'list_video_example/list_video_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom]);
+  // Than we setup preferred orientations,
+  // and only after it finished we run our app
+
+  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]).then((value) => runApp(const MyApp()));
   runApp(const MyApp());
 }
 
@@ -18,7 +25,7 @@ class MyApp extends StatelessWidget {
       title: 'VRssage',
       theme: ThemeData(
 
-        primarySwatch: Colors.deepOrange,
+        primarySwatch: Colors.blue,
       ),
       home: Splash(),
     );

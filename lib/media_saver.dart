@@ -82,7 +82,7 @@ class MediaSaver{
       //var progress = Progress();
       await Dio().download(videoUrl, path, onReceiveProgress: (received, total) {
         if (total != -1) {
-          //var progressNotifier = ("${(received / total * 100).toStringAsFixed(0)}%");
+          var progressNotifier = ("${(received / total * 100).toStringAsFixed(0)}%");
           //print(progressNotifier);
         }
       });

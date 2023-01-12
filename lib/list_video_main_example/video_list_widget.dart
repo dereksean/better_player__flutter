@@ -1,20 +1,18 @@
 import 'package:better_player/better_player.dart';
-import 'package:better_player_example/list_video_main_example/video_list_data.dart';
+import 'package:VRssage/list_video_main_example/video_list_data.dart';
 import 'package:flutter/material.dart';
 
-import '../model/videos_model.dart';
-
 class VideoListWidget extends StatefulWidget {
-  final Videos? videos;
+  final VideoListData? videoListData;
 
-  const VideoListWidget({Key? key, this.videos}) : super(key: key);
+  const VideoListWidget({Key? key, this.videoListData}) : super(key: key);
 
   @override
   _VideoListWidgetState createState() => _VideoListWidgetState();
 }
 
 class _VideoListWidgetState extends State<VideoListWidget> {
-  Videos? get videos => widget.videos;
+  VideoListData? get videoListData => widget.videoListData;
   BetterPlayerConfiguration? betterPlayerConfiguration;
   BetterPlayerListVideoPlayerController? controller;
 
@@ -22,35 +20,34 @@ class _VideoListWidgetState extends State<VideoListWidget> {
   void initState() {
     super.initState();
     controller = BetterPlayerListVideoPlayerController();
-    betterPlayerConfiguration = BetterPlayerConfiguration(autoPlay: false);
+    betterPlayerConfiguration = BetterPlayerConfiguration(autoPlay: true);
   }
 
   @override
   void dispose() {
     super.dispose();
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 45, horizontal: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(8),
             child: Text(
-              videos!.videoTitle.toString(),
-              style: const TextStyle(fontSize: 50),
+              videoListData!.videoTitle,
+              style: const TextStyle(fontSize: 25),
             ),
           ),
           AspectRatio(
-              aspectRatio: 1,
+              aspectRatio: 16 / 9,
               child:BetterPlayerListVideoPlayer(
                 BetterPlayerDataSource(
-                  BetterPlayerDataSourceType.network,
-                  videos!.videoUrl.toString(),
+                  BetterPlayerDataSourceType.file,
+                  videoListData!.videoUrl,
                   // notificationConfiguration:
                   // BetterPlayerNotificationConfiguration(
                   //     showNotification: false,
@@ -63,12 +60,19 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                       bufferForPlaybackAfterRebufferMs: 2000),
                 ),
                 configuration: const BetterPlayerConfiguration(
-                    showPlaceholderUntilPlay: true,
-                    autoPlay: false, aspectRatio: 1, handleLifecycle: true),
+                    showPlaceholderUntilPlay: false,
+                    //startAt: Duration(seconds: 5),
+                    autoPlay: true, aspectRatio: 1,
+                    handleLifecycle: true,
+                    fullScreenByDefault: true,
+
+
+                ),
                 //key: Key(videoListData.hashCode.toString()),
                 // playFraction: 0.8,
-                //playFraction: 0.9,
+                playFraction: 1.0,
                 betterPlayerListVideoPlayerController: controller,
+
               )),
           // const Padding(
           //   padding: EdgeInsets.all(8),

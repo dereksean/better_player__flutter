@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:better_player_example/constants.dart';
-import 'package:better_player_example/list_video_main_example/video_list_data.dart';
-import 'package:better_player_example/list_video_reusable/reusable_video_list_controller.dart';
-import 'package:better_player_example/list_video_reusable/reusable_video_list_widget.dart';
+import 'package:VRssage/constants.dart';
+import 'package:VRssage/list_video_main_example/video_list_data.dart';
+import 'package:VRssage/list_video_reusable/reusable_video_list_controller.dart';
+import 'package:VRssage/list_video_reusable/reusable_video_list_widget.dart';
 import 'package:flutter/material.dart';
 
 class ReusableVideoListPage extends StatefulWidget {

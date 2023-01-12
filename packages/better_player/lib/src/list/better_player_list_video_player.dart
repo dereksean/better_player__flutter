@@ -30,7 +30,7 @@ class BetterPlayerListVideoPlayer extends StatefulWidget {
   const BetterPlayerListVideoPlayer(
     this.dataSource, {
     this.configuration = const BetterPlayerConfiguration(),
-    this.playFraction = 0.6,
+    this.playFraction = 1.0,
     this.autoPlay = false,
     this.autoPause = true,
     this.betterPlayerListVideoPlayerController,

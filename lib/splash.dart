@@ -1,15 +1,16 @@
-import 'package:better_player_example/list_video_main_example/video_list_page.dart';
-import 'package:better_player_example/list_video_pagination_reusable/list_video_pagination_reusable.dart';
-import 'package:better_player_example/list_video_reusable/reusable_video_list_page.dart';
-import 'package:better_player_example/services/api_service.dart';
-import 'package:better_player_example/single_video_example/better_player_page.dart';
-import 'package:better_player_example/slider/slider_page.dart';
-import 'package:better_player_example/snackbar.dart';
+import 'package:VRssage/list_video_main_example/video_list_page.dart';
+import 'package:VRssage/list_video_pagination_reusable/list_video_pagination_reusable.dart';
+import 'package:VRssage/list_video_reusable/reusable_video_list_page.dart';
+import 'package:VRssage/services/api_service.dart';
+import 'package:VRssage/single_video_example/better_player_page.dart';
+import 'package:VRssage/slider/slider_page.dart';
+import 'package:VRssage/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'list_video_example/list_video_page.dart';
+import 'list_video_example/video_playlist.dart';
 import 'media_saver.dart';
 import 'model/videos_model.dart';
 
@@ -66,7 +67,7 @@ class _SplashState extends State<Splash> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Image.asset('lib/assets/images/vrssagelogomain.png', fit: BoxFit.contain,height: 50),
+        title: Image.asset('lib/assets/images/vrssage_banner_trans.png', fit: BoxFit.contain,height: 50),
       ),
       body: Center(
         child: Column(
@@ -83,7 +84,7 @@ class _SplashState extends State<Splash> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ListPlayerPage(),
+                          builder: (context) =>  const PlayListPlayerPage(),
                         ),
                       );
                     },
@@ -143,12 +144,12 @@ class _SplashState extends State<Splash> {
     //Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
     _videos = (await ApiService().getVideos());
     Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
-    List<Videos> videos = ApiService().videos;
+    //List<Videos> videos = ApiService().videos;
 
     for (var videoUrl in _videos!) {
 
       //_saveAssetVideoToFile(videoUrl.videoUrl.toString());
-      _checkVideoAlreadySaved(videoUrl.videoUrl.toString());
+      await _checkVideoAlreadySaved(videoUrl.videoUrl.toString());
 
 
     }
@@ -156,7 +157,7 @@ class _SplashState extends State<Splash> {
 
   }
 
-  void saveVideo()  {
+  Future<void> saveVideo() async {
 
     for (var videoUrl in _videos!) {
       saveVideoInGallery(videoUrl.videoUrl.toString());
@@ -201,7 +202,7 @@ class _SplashState extends State<Splash> {
       _isDownloading = true;
 
 
-        if (savedSuccessfully) {
+      if (savedSuccessfully) {
         if (!mounted) return;
         GlobalSnackBar.show(context, "videos downloaded");
         _isDownloading = false;
@@ -210,11 +211,11 @@ class _SplashState extends State<Splash> {
       }
       setState(() {
 
-    });
-    //   else {
-    // if (!mounted) return;
-    // GlobalSnackBar.show(context, "video already downloaded");
-    // }
-  }
+      });
+      //   else {
+      // if (!mounted) return;
+      // GlobalSnackBar.show(context, "video already downloaded");
+      // }
+    }
 
-}}
+  }}

@@ -1,7 +1,7 @@
 import 'package:better_player/better_player.dart';
-import 'package:better_player_example/slider/pager_model.dart';
-import 'package:better_player_example/slider/video_player_item.dart';
-import 'package:better_player_example/snackbar.dart';
+import 'package:VRssage/slider/pager_model.dart';
+import 'package:VRssage/slider/video_player_item.dart';
+import 'package:VRssage/snackbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 

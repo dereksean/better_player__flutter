@@ -1,10 +1,11 @@
 import 'dart:io';
-
+import 'package:VRssage/playlist/better_player_playlist.dart' as bpd;
+import 'package:VRssage/playlist/better_player_playlist_configuration.dart' as bppcf;
+import 'package:VRssage/playlist/better_player_playlist_controller.dart' as bppct;
 import 'package:better_player/better_player.dart';
 import 'package:VRssage/list_video_example/image_item.dart';
 import 'package:VRssage/list_video_example/model.dart';
 import 'package:VRssage/list_video_example/video_item.dart';
-import 'package:VRssage/list_video_example/video_playlist.dart';
 import 'package:VRssage/list_video_example/videolist_widget.dart';
 import 'package:dio/dio.dart';
 //import 'package:filesystem_picker/filesystem_picker.dart';
@@ -19,21 +20,27 @@ import '../Constants.dart';
 import '../media_saver.dart';
 import '../services/apiResponse.dart';
 import '../snackbar.dart';
+import 'list_video_page.dart';
 
-class ListPlayerPage extends StatefulWidget {
-  const ListPlayerPage({Key? key}) : super(key: key);
+class PlayListPlayerPage extends StatefulWidget {
+  const PlayListPlayerPage({Key? key}) : super(key: key);
 
   @override
-  State<ListPlayerPage> createState() => _ListPlayerPageState();
+  State<PlayListPlayerPage> createState() => _PlayListPlayerPage();
 }
 
-class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliveClientMixin {
+class _PlayListPlayerPage extends State<PlayListPlayerPage>  with AutomaticKeepAliveClientMixin {
   //List<Model> list = [];
   List<Videos>? _videos = [];
   List<String> _videoUrls = [];
   late BetterPlayerController betterPlayerController;
   List dataSourceList = <BetterPlayerDataSource>[]; //List of data sources
   List videoItems = <VideoItem>[];//List of video Items
+  final Future<String> _calculation = Future<String>.delayed(
+    const Duration(seconds: 2),
+        () => 'Data Loaded',
+  );
+
 
   // // Create a BetterPlayerController for each video URL
   // late List<BetterPlayerDataSource> betterPlayerController = _videoUrls
@@ -47,7 +54,7 @@ class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliv
 
   bool sourceChecked = false;
 
-  int selectedVideoIndex = -1 ;
+  int selectedVideoIndex = 0 ;
   var value = 0;
 
   @override
@@ -60,24 +67,22 @@ class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliv
       _ifLoaded();
     });
 
-
   }
 
   _ifLoaded() async {
-  if (await Permission.storage.request().isGranted) {
-    _getData();
-    //buck();
-    //setUpList();
+    if (await Permission.storage.request().isGranted) {
+      _getData();
+      //buck();
+      //setUpList();
 
 
+      //_setupController("https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4");
+      _setupController(videoPath);
 
-    //_setupController("https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4");
-    _setupController(videoPath);
 
-
-    //_setupData();
-    //onVisibilityChanged(100);
-  }}
+      //_setupData();
+      //onVisibilityChanged(100);
+    }}
 
 
   // void buck() async {// for android Directory
@@ -111,8 +116,8 @@ class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliv
     for (int i = 0; i < _videoUrls.length; i++) {
       videoItems.add(VideoItem(
           betterPlayerController: betterPlayerController,
-          videoUrl: _videoUrls[i]));
 
+          videoUrl: _videoUrls[i]));
     }
     // dataSourceList.add(
     //   BetterPlayerDataSource(
@@ -133,11 +138,16 @@ class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliv
     // betterPlayerController.removeEventsListener((p0) => null);
     // betterPlayerController.videoPlayerController == null;
     // _isDisposing = true;
-    if (betterPlayerController.videoPlayerController != null) {
-      betterPlayerController!.dispose(forceDispose: true);
+    //if (betterPlayerController.videoPlayerController != null) {
+
+    betterPlayerController.videoPlayerController!.dispose();
+      betterPlayerController!.dispose();
+
+
+
       //betterPlayerController.videoPlayerController = null;
       //print("Disposed controller from Framework.");
-    }
+    //}
     super.dispose();
 
   }
@@ -214,22 +224,114 @@ class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliv
   //       ));
   // }
 
+
+
   // @override
   //
   // Widget build(BuildContext context) {
   //   //var test = createDataSet();
-  //   return AspectRatio(
-  //     aspectRatio: 16 / 9,
-  //     child: BetterPlayerPlaylist(
-  //         betterPlayerConfiguration: BetterPlayerConfiguration(autoPlay: true, autoDispose: true),
-  //         betterPlayerPlaylistConfiguration: const BetterPlayerPlaylistConfiguration(
-  //           loopVideos: true,
-  //           autoPlay: true,
-  //           nextVideoDelay: Duration(seconds: 1),
-  //         ),
-  //         betterPlayerDataSourceList: dataSourceList as List<BetterPlayerDataSource>),
+  //   return FutureBuilder(
+  //       future: createDataSet(),
+  //       builder: (BuildContext context, AsyncSnapshot<Object> snapshot) {
+  //         if (snapshot.hasData) {
+  //           return Material(
+  //             child:  AspectRatio(
+  //               aspectRatio: 16 / 9,
+  //               child: bpd.BetterPlayerPlaylist(
+  //                   betterPlayerConfiguration: BetterPlayerConfiguration(autoPlay: true, autoDispose: true),
+  //                   betterPlayerPlaylistConfiguration: const BetterPlayerPlaylistConfiguration(
+  //                     loopVideos: true,
+  //                     autoPlay: true,
+  //                     nextVideoDelay: Duration(seconds: 1),
+  //                   ),
+  //                   betterPlayerDataSourceList: snapshot.data as List<BetterPlayerDataSource>),
+  //             ),
+  //           );
+  //         } else {
+  //           return const Center(
+  //             child: CircularProgressIndicator(),
+  //           );
+  //         }
+  //       }
   //   );
   // }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTextStyle(
+      style: Theme.of(context).textTheme.displayMedium!,
+      textAlign: TextAlign.center,
+      child: FutureBuilder<String>(
+
+        future: _calculation, // a previously-obtained Future<String> or null
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          List<Widget> children;
+          if (snapshot.hasData) {
+            children = <Widget>[
+              Material(
+                  child:  AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: bpd.BetterPlayerPlaylist(
+                        betterPlayerConfiguration: BetterPlayerConfiguration(autoPlay: true, autoDispose: true),
+                        betterPlayerPlaylistConfiguration: const BetterPlayerPlaylistConfiguration(
+                          loopVideos: true,
+                          autoPlay: true,
+                          nextVideoDelay: Duration(seconds: 1),
+                        ),
+                        betterPlayerDataSourceList: dataSourceList as List<BetterPlayerDataSource>),
+                  ),
+                ),
+
+            ];
+          }
+          // else if (snapshot.hasError) {
+          //   children = <Widget>[
+          //     const Icon(
+          //       Icons.error_outline,
+          //       color: Colors.red,
+          //       size: 60,
+          //     ),
+          //     Padding(
+          //       padding: const EdgeInsets.only(top: 16),
+          //       child: Text('Error: ${snapshot.error}'),
+          //     ),
+          //   ];
+          // }
+          else {
+            children = const <Widget>[
+              SizedBox(
+                width: 60,
+                height: 60,
+                child: RefreshProgressIndicator(),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Text('Loading Videos...'),
+              ),
+            ];
+          }
+          return children[0];
+        },
+      ),
+    );
+  }
+
+
+  // return Material(
+  // child:  AspectRatio(
+  // aspectRatio: 16 / 9,
+  // child: bpd.BetterPlayerPlaylist(
+  // betterPlayerConfiguration: BetterPlayerConfiguration(autoPlay: true, autoDispose: true),
+  // betterPlayerPlaylistConfiguration: const BetterPlayerPlaylistConfiguration(
+  // loopVideos: true,
+  // autoPlay: true,
+  // nextVideoDelay: Duration(seconds: 1),
+  // ),
+  // betterPlayerDataSourceList: dataSourceList as List<BetterPlayerDataSource>),
+  // ),
+  // );
+//}
+
 
   // @override
   // Widget build(BuildContext context) {
@@ -270,102 +372,86 @@ class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliv
   //             );}));
   // }
 
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery
-        .of(context)
-        .size;
-
-
-    // return Scaffold(
-    //     body: Container(
-    //
-    //         padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
-    //         height: size.height,
-    //         width: size.width,
-
-    return  Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          title: Image.asset('lib/assets/images/vrssagelogomain.png', fit: BoxFit.contain,height: 50),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(builder: (context) => const PlayListPlayerPage()),
-    (Route<dynamic> route) => false);},
-              // {Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) =>  const PlayListPlayerPage(),
-              //   ),
-              // );},
-              child: Text("Play All Videos", style: TextStyle(color: Colors.white)),
-
-            ),
-          ],
-        ),
-        body: ListView.builder(
-            padding: const EdgeInsets.only(top: 10.0),
-            shrinkWrap: true,
-            itemCount: videoItems?.length,
-            itemBuilder: (context, index) {
-
-              return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(
-                            _videos![index].videoTitle.toString(),
-                            style: const TextStyle(fontSize: 25),
-                          ),
-                        ),
-                        // list[index].type == "image"
-                        //      ? ImageItem(
-                        //          imageUrl: list[index].imageUrl,
-                        //          description: list[index].description)
-                        GestureDetector(
-                        child: VideoListItem(_videoUrls[index]),
-
-                        //   child: VideoItem(
-                        //       canBuild: selectedVideoIndex == index ? true : false,
-                        //       betterPlayerController: betterPlayerController,
-                        //       description: _videos![index].videoTitle.toString(),
-                        //       videoUrl: _videoUrls![index].toString(),
-                        //       thumbnailUrl: _videos![index].videoTitle.toString()),
-                        //   onTap: () {
-                        //     // if(selectedVideoIndex==-1||(betterPlayerController.isVideoInitialized()??false) ) {
-                        //
-                        //     setState(() {
-                        //       value++;
-                        //       selectedVideoIndex = index;
-                        //
-                        //       // for(var videos in videoItems)
-                        //       //   {
-                        //       //     videos[index].betterPlayerController;
-                        //       //   }
-                        //       _setupController(_videoUrls![index].toString());
-                        //       //_freeController();
-                        //       betterPlayerController.videoPlayerController!.addListener(
-                        //           checkVideo);
-                        //       checkVideo();
-                        //     });
-                        //
-                        //
-                        //
-                        //
-                        //     // }
-                        //   },
-                        ),
-
-
-                        // ),
-                      ]));}));
-  }
+  // @override
+  // Widget build(BuildContext context) {
+  //   Size size = MediaQuery
+  //       .of(context)
+  //       .size;
+  //
+  //
+  //   // return Scaffold(
+  //   //     body: Container(
+  //   //
+  //   //         padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
+  //   //         height: size.height,
+  //   //         width: size.width,
+  //
+  //   return  Scaffold(
+  //       resizeToAvoidBottomInset: false,
+  //       appBar: AppBar(
+  //         backgroundColor: Colors.black,
+  //         title: Image.asset('lib/assets/images/vrssagelogomain.png', fit: BoxFit.contain,height: 50),
+  //       ),
+  //       body: ListView.builder(
+  //           padding: const EdgeInsets.only(top: 10.0),
+  //           shrinkWrap: true,
+  //           itemCount: videoItems?.length,
+  //           itemBuilder: (context, index) {
+  //
+  //             return Card(
+  //                 margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+  //                 child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Padding(
+  //                         padding: const EdgeInsets.all(8),
+  //                         child: Text(
+  //                           _videos![index].videoTitle.toString(),
+  //                           style: const TextStyle(fontSize: 25),
+  //                         ),
+  //                       ),
+  //                       // list[index].type == "image"
+  //                       //      ? ImageItem(
+  //                       //          imageUrl: list[index].imageUrl,
+  //                       //          description: list[index].description)
+  //                       GestureDetector(
+  //                         child: VideoListItem(_videoUrls[index]),
+  //
+  //                         //   child: VideoItem(
+  //                         //       canBuild: selectedVideoIndex == index ? true : false,
+  //                         //       betterPlayerController: betterPlayerController,
+  //                         //       description: _videos![index].videoTitle.toString(),
+  //                         //       videoUrl: _videoUrls![index].toString(),
+  //                         //       thumbnailUrl: _videos![index].videoTitle.toString()),
+  //                         onTap: () {
+  //                           // if(selectedVideoIndex==-1||(betterPlayerController.isVideoInitialized()??false) ) {
+  //
+  //                           setState(() {
+  //                             value++;
+  //                             selectedVideoIndex = index;
+  //
+  //                             // for(var videos in videoItems)
+  //                             //   {
+  //                             //     videos[index].betterPlayerController;
+  //                             //   }
+  //                             _setupController(_videoUrls![index].toString());
+  //                             //_freeController();
+  //                             betterPlayerController.videoPlayerController!.addListener(
+  //                                 checkVideo);
+  //                             checkVideo();
+  //                           });
+  //
+  //
+  //
+  //
+  //                           // }
+  //                         },
+  //                       ),
+  //
+  //
+  //                       // ),
+  //                     ]));}));
+  // }
 
 //   //******************************Getting data from an API******************************//
 //   return Scaffold(
@@ -420,27 +506,27 @@ class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliv
   void _setupController(String videoUrl) {
 
     BetterPlayerConfiguration betterPlayerConfiguration = const BetterPlayerConfiguration();
-      // (
-      //
-      // aspectRatio: 16 / 9,
-      //   //aspectRatio: 1,
-      //   fit: BoxFit.fill,
-      //   handleLifecycle: true,
-      //   autoDispose: true,
-      //   autoPlay: true,
-      //   fullScreenByDefault: true,
-      //
-      //   showPlaceholderUntilPlay: false,
-      //   looping: false,
-      //   controlsConfiguration: BetterPlayerControlsConfiguration(
-      //       controlBarColor: Colors.black.withAlpha(600),
-      //       controlBarHeight: 30,
-      //       overflowModalColor: Colors.yellow,
-      //       overflowModalTextColor: Colors.white,
-      //       overflowMenuIconsColor: Colors.white,
-      //       enableSkips: false,
-      //       // playIcon: const AssetImage("assets/images/play_icon.png"),
-      //       enablePlayPause: true));
+    // (
+    //
+    // aspectRatio: 16 / 9,
+    //   //aspectRatio: 1,
+    //   fit: BoxFit.fill,
+    //   handleLifecycle: true,
+    //   autoDispose: true,
+    //   autoPlay: true,
+    //   fullScreenByDefault: true,
+    //
+    //   showPlaceholderUntilPlay: false,
+    //   looping: false,
+    //   controlsConfiguration: BetterPlayerControlsConfiguration(
+    //       controlBarColor: Colors.black.withAlpha(600),
+    //       controlBarHeight: 30,
+    //       overflowModalColor: Colors.yellow,
+    //       overflowModalTextColor: Colors.white,
+    //       overflowMenuIconsColor: Colors.white,
+    //       enableSkips: false,
+    //       // playIcon: const AssetImage("assets/images/play_icon.png"),
+    //       enablePlayPause: true));
 
     // // check if video already downloaded  play video from path or else play from network
     // BetterPlayerDataSource? _betterPlayerDataSource = videoPath == ""
@@ -467,33 +553,13 @@ class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliv
   void saveVideo()  {
 
     for (var videoUrl in _videos!) {
-       saveVideoInGallery(videoUrl.videoUrl.toString());
+      saveVideoInGallery(videoUrl.videoUrl.toString());
     }
   }
 
 
 
-  void checkVideo(){
-    // Implement your calls inside these conditions' bodies :
-    if(betterPlayerController.videoPlayerController?.value.position == const Duration(seconds: 1, minutes: 0, hours: 0)) {
-      betterPlayerController.enterFullScreen();
-      print('video Started');
-    }
 
-
-
-    if(betterPlayerController.videoPlayerController?.value.position == betterPlayerController.videoPlayerController?.value.duration) {
-      betterPlayerController.exitFullScreen();
-      print('video Ended');
-    }
-
-    // if(betterPlayerController.betterPlayerConfiguration.autoDispose == true && (betterPlayerController.isVideoInitialized()??false)) {
-    //   //betterPlayerController.videoPlayerController = null;
-    //   print('Flammed');
-    // }
-
-
-  }
 
 
 
@@ -533,15 +599,15 @@ class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliv
       if (!mounted) return;
       bool savedSuccessfully =
       await MediaSaver().saveVideoInDevice(videoUrl, context);
-    //   if (savedSuccessfully) {
-    //   if (!mounted) return;
-    //   GlobalSnackBar.show(context, "video downloaded");
+      //   if (savedSuccessfully) {
+      //   if (!mounted) return;
+      //   GlobalSnackBar.show(context, "video downloaded");
+      // }
+    }
+    //   else {
+    // if (!mounted) return;
+    // GlobalSnackBar.show(context, "video already downloaded");
     // }
-  }
-  //   else {
-  // if (!mounted) return;
-  // GlobalSnackBar.show(context, "video already downloaded");
-  // }
   }
 
   // ///Save video to file, so we can use it later

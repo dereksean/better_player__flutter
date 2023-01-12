@@ -141,8 +141,8 @@ class BetterPlayerConfiguration {
     ],
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
     this.deviceOrientationsAfterFullScreen = const [
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ],

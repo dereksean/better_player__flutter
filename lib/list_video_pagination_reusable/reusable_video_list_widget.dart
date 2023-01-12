@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:better_player/better_player.dart';
-import 'package:better_player_example/list_video_main_example/video_list_data.dart';
-import 'package:better_player_example/list_video_pagination_reusable/reusable_video_list_controller.dart';
-// import 'package:better_player_example/list_video_main_example/video_list_data.dart';
-// import 'package:better_player_example/list_video_reusable/reusable_video_list_controller.dart';
+import 'package:VRssage/list_video_main_example/video_list_data.dart';
+import 'package:VRssage/list_video_pagination_reusable/reusable_video_list_controller.dart';
+// import 'package:VRssage/list_video_main_example/video_list_data.dart';
+// import 'package:VRssage/list_video_reusable/reusable_video_list_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:visibility_detector/visibility_detector.dart';

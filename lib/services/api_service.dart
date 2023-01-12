@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:better_player_example/services/apiResponse.dart';
+import 'package:VRssage/services/apiResponse.dart';
 import 'package:http/http.dart' as http;
-import 'package:better_player_example/constants.dart';
-import 'package:better_player_example/model/videos_model.dart';
+import 'package:VRssage/constants.dart';
+import 'package:VRssage/model/videos_model.dart';
 import '../services/apiResponse.dart';
 
 class ApiService {

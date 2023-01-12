@@ -1,9 +1,9 @@
 
 import 'package:better_player/better_player.dart';
-import 'package:better_player_example/create_folder.dart';
-import 'package:better_player_example/media_saver.dart';
-import 'package:better_player_example/snackbar.dart';
-import 'package:better_player_example/video_item.dart';
+import 'package:VRssage/create_folder.dart';
+import 'package:VRssage/media_saver.dart';
+import 'package:VRssage/snackbar.dart';
+import 'package:VRssage/video_item.dart';
 // import 'package:chewie_player/create_folder.dart';
 // import 'package:chewie_player/media_saver.dart';
 // import 'package:chewie_player/snackbar.dart';

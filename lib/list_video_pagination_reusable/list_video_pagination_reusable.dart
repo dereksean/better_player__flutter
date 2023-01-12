@@ -1,6 +1,6 @@
 
-import 'package:better_player_example/list_video_pagination_reusable/reusable_video_list_controller.dart';
-import 'package:better_player_example/list_video_pagination_reusable/reusable_video_list_widget.dart';
+import 'package:VRssage/list_video_pagination_reusable/reusable_video_list_controller.dart';
+import 'package:VRssage/list_video_pagination_reusable/reusable_video_list_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../list_video_main_example/video_list_data.dart';

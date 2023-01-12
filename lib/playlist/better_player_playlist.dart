@@ -9,6 +9,8 @@ import 'package:better_player/src/playlist/better_player_playlist_controller.dar
 // Flutter imports:
 import 'package:flutter/material.dart';
 
+import '../list_video_example/list_video_page.dart';
+
 ///Special version of Better Player used to play videos in playlist.
 class BetterPlayerPlaylist extends StatefulWidget {
   final List<BetterPlayerDataSource> betterPlayerDataSourceList;
@@ -65,26 +67,31 @@ checkVideo();
 
   void checkVideo(){
     Future.delayed(Duration.zero, () {
-      // Implement your calls inside these conditions' bodies :
-      if(_betterPlayerController?.videoPlayerController?.value.position == const Duration(seconds: 1, minutes: 0, hours: 0)) {
-        //betterPlayerController.enterFullScreen();
-        print('video Started');
-      }
+      // // Implement your calls inside these conditions' bodies :
+      // if(_betterPlayerController?.videoPlayerController?.value.position == const Duration(seconds: 1, minutes: 0, hours: 0)) {
+      //   //betterPlayerController.enterFullScreen();
+      //   print('video Started');
 
 
 
-    //   if(_betterPlayerController?.videoPlayerController?.value.position == _betterPlayerController?.videoPlayerController?.value.duration || _betterPlayerController?.videoPlayerController?.value.isPlaying == false) {
-    //     Navigator.push(
-    //       context,
-    //       MaterialPageRoute(
-    //         builder: (context) =>  const ListPlayerPage(),
-    //       ),
-    //     );
-    //
-    //   // navigate to the desired route
-    //   Navigator.pushNamed(context, const ListPlayerPage());
-    //   print('video Ended');
-    // }
+
+      if(_betterPlayerController?.videoPlayerController?.value.position == _betterPlayerController?.videoPlayerController?.value.duration || _betterPlayerController?.videoPlayerController?.value.isPlaying == false) {
+        //dispose();
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const ListPlayerPage()),
+                (Route<dynamic> route) => false);
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) =>  const ListPlayerPage(),
+        //   ),
+        // );
+        print('video Ended');
+
+      // // navigate to the desired route
+      // Navigator.pushNamed(context, const ListPlayerPage());
+      // print('video Ended');
+    }
     });
     // if(betterPlayerController.betterPlayerConfiguration.autoDispose == true && (betterPlayerController.isVideoInitialized()??false)) {
     //   //betterPlayerController.videoPlayerController = null;
@@ -94,9 +101,19 @@ checkVideo();
 
   }
 
+  // @protected
+  // @mustCallSuper
+  // void deactivate() {
+  //   // _betterPlayerController?.videoPlayerController?.dispose();
+  //   // _betterPlayerPlaylistController!.dispose();
+  //   super.deactivate();
+  // }
+
   @override
   void dispose() {
+    _betterPlayerController?.videoPlayerController?.dispose();
     _betterPlayerPlaylistController!.dispose();
+
     super.dispose();
   }
 }
