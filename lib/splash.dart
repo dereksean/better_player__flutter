@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:VRssage/list_video_main_example/video_list_page.dart';
 import 'package:VRssage/list_video_pagination_reusable/list_video_pagination_reusable.dart';
 import 'package:VRssage/list_video_reusable/reusable_video_list_page.dart';
@@ -25,6 +27,7 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   List<Videos>? _videos = [];
   List<String> _videoUrls = [];
+  List<Future<String>> savedVideolist = [];
 
   String videoPath = "";
 
@@ -32,6 +35,47 @@ class _SplashState extends State<Splash> {
 
   // A flag to track whether the files are currently being downloaded.
   bool _isDownloading = false;
+  bool ActiveConnection = false;
+  String T = "";
+  // final Future<String> _calculation = Future<String>.delayed(
+  //   const Duration(seconds: 2),
+  //       () => 'Data Loaded',
+  // );
+
+  Future CheckUserConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        setState(() {
+          ActiveConnection = true;
+          T = "Turn off the data and repress again";
+        });
+      }
+    } on SocketException catch (_) {
+      setState(() {
+        ActiveConnection = false;
+        T = "Make sure you are connected to the internet and try again.";
+      });
+    }
+  }
+
+  // Future<List> test() async {
+  //   var videoName = videoPath.substring(videoPath.lastIndexOf('/') + 1);
+  //   var dir = await getApplicationDocumentsDirectory();
+  //   String path= "${dir.path}/$videoName";
+  //
+  //   for (int i = 0; i < _videoUrls.length; i++) {
+  //     savedVideolist.add(path);
+  //
+  //   }
+  //   // dataSourceList.add(
+  //   //   BetterPlayerDataSource(
+  //   //     BetterPlayerDataSourceType.file,
+  //   //     "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+  //   //   ),
+  //   // );
+  //   return savedVideolist;
+  // }
 
   @override
   void initState() {
@@ -45,7 +89,9 @@ class _SplashState extends State<Splash> {
     if (await Permission.storage
         .request()
         .isGranted) {
-      _getData();
+      await CheckUserConnection();
+      await _getData();
+
     }
   }
 
@@ -74,11 +120,71 @@ class _SplashState extends State<Splash> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
 
-
+         // FutureBuilder(
+         //
+         //      future: _getData(), // a previously-obtained Future<String> or null
+         //      builder: (BuildContext context, AsyncSnapshot snapshot) {
+         //        if (snapshot.connectionState == ConnectionState.done) {
+         //          List<Widget> children;
+         //          if (_isDownloading){
+         //            children = <Widget>[
+         //        ElevatedButton(
+         //        onPressed: () {
+         //        Navigator.push(
+         //        context,
+         //        MaterialPageRoute(
+         //        builder: (context) =>  const PlayListPlayerPage(),
+         //        ),
+         //        );
+         //        },
+         //        child: const Text('Go to My Videos'),
+         //
+         //        ),
+         //
+         //            ];
+         //          } else if (ActiveConnection == false) {
+         //            children = <Widget>[
+         //              const Icon(
+         //                Icons.error_outline,
+         //                color: Colors.red,
+         //                size: 60,
+         //              ),
+         //              Padding(
+         //                padding: const EdgeInsets.only(top: 16),
+         //                child: CheckUserConnection().toString() == "true"
+         //                    ? Text('Error: $T')
+         //                    : Text('Error: $T'),
+         //              ),
+         //            ];
+         //          } else {
+         //            children = const <Widget>[
+         //              SizedBox(
+         //                width: 60,
+         //                height: 60,
+         //                child: CircularProgressIndicator(),
+         //              ),
+         //              Padding(
+         //                padding: EdgeInsets.only(top: 16),
+         //                child: Text('Downloading Videos...'),
+         //              ),
+         //            ];
+         //          }
+         //          return Center(
+         //            child: Column(
+         //              mainAxisAlignment: MainAxisAlignment.center,
+         //
+         //              children: children,
+         //            ),
+         //          );
+         //        } else {
+         //          return const CircularProgressIndicator();
+         //        }
+         //      },
+            //)
             FutureBuilder(
-              future: saveVideoInGallery(videoPath), // function that returns a Future
+              future: Future.wait(savedVideolist), // function that returns a Future
               builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.connectionState == ConnectionState.done && _isDownloading == true) {
                   return ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -136,7 +242,7 @@ class _SplashState extends State<Splash> {
     );
   }
 
-  void _getData() async {
+  Future<void> _getData() async {
 
 
 
@@ -153,15 +259,20 @@ class _SplashState extends State<Splash> {
 
 
     }
-    saveVideo();
+    await saveVideo();
 
   }
 
-  Future<void> saveVideo() async {
+  Future<List> saveVideo() async {
 
-    for (var videoUrl in _videos!) {
-      saveVideoInGallery(videoUrl.videoUrl.toString());
-    }
+      for (int i = 0; i <  _videos!.length; i++) {
+        //saveVideoInGallery(videoUrl.videoUrl.toString());
+        savedVideolist.add(saveVideoInGallery(_videos![i].videoUrl.toString()));
+      }
+      _isDownloading = false;
+
+    _isDownloading = true;
+    return savedVideolist;
   }
 
   Future<List<String>> _checkVideoAlreadySaved(String videoUrl) async {
@@ -179,6 +290,8 @@ class _SplashState extends State<Splash> {
       return _videoUrls;
     }
     _videoUrls?.add(videoUrl);
+
+    //test();
     return _videoUrls;
 
 
@@ -189,33 +302,54 @@ class _SplashState extends State<Splash> {
     //_setupController("https://vrssagestorage.blob.core.windows.net/fileupload/desert.mp4");
   }
 
-  Future<void> saveVideoInGallery(String videoUrl) async {
+  Future<String> saveVideoInGallery(String videoUrl) async {
     bool isVideoAlreadySavedInDevice =
     await MediaSaver().isVideoAlreadySavedInDevice(videoUrl);
 
     if (!isVideoAlreadySavedInDevice) {
 
       // save Image to device
-      if (!mounted) return;
-      bool savedSuccessfully =
+      if (!mounted) return "Not mounted!";
+      bool _isDownloading =
       await MediaSaver().saveVideoInDevice(videoUrl, context);
-      _isDownloading = true;
+      //_isDownloading = true;
 
 
-      if (savedSuccessfully) {
-        if (!mounted) return;
+      if (_isDownloading) {
+        if (!mounted) return "Not mounted!";
         GlobalSnackBar.show(context, "videos downloaded");
-        _isDownloading = false;
+        //_isDownloading = false;
 
 
       }
-      setState(() {
 
-      });
+
       //   else {
       // if (!mounted) return;
       // GlobalSnackBar.show(context, "video already downloaded");
       // }
     }
+    //savedVideolist.add(videoUrl);
+    return "done";
 
-  }}
+  }
+
+  @override
+  void dispose() {
+    // if (betterPlayerController.isPlaying() == true) betterPlayerController.pause();
+    // betterPlayerController.removeEventsListener((p0) => null);
+    // betterPlayerController.videoPlayerController == null;
+    // _isDisposing = true;
+    //if (betterPlayerController.videoPlayerController != null) {
+
+
+
+
+    //betterPlayerController.videoPlayerController = null;
+    //print("Disposed controller from Framework.");
+    //}
+    super.dispose();
+
+  }
+
+}

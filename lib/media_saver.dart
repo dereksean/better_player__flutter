@@ -81,17 +81,21 @@ class MediaSaver{
     try{
       //var progress = Progress();
       await Dio().download(videoUrl, path, onReceiveProgress: (received, total) {
-        if (total != -1) {
-          var progressNotifier = ("${(received / total * 100).toStringAsFixed(0)}%");
-          //print(progressNotifier);
-        }
+        // if (total != -1) {
+        //   var progressNotifier = ("${(received / total * 100).toStringAsFixed(0)}%");
+        //   print(progressNotifier);
+        // }
       });
-      await GallerySaver.saveVideo(videoUrl);
+      //await GallerySaver.saveVideo(videoUrl);
+      print("All videos saved");
       return true;
     }catch(e){
       return false;
+
     }
   }
+
+
 
 
   Future<bool> deleteVideoFile(String videoUrl) async {
