@@ -288,7 +288,7 @@ class _ListPlayerPageState extends State<ListPlayerPage>  with AutomaticKeepAliv
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.black,
-          title: Image.asset('lib/assets/images/vrssagelogomain.png', fit: BoxFit.contain,height: 50),
+          title: Image.asset('lib/assets/images/vrssage_banner_trans.png', fit: BoxFit.contain,height: 50),
           actions: <Widget>[
             TextButton(
               onPressed: () {Navigator.pushAndRemoveUntil(

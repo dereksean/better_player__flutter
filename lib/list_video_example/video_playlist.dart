@@ -37,7 +37,7 @@ class _PlayListPlayerPage extends State<PlayListPlayerPage>  with AutomaticKeepA
   List dataSourceList = <BetterPlayerDataSource>[]; //List of data sources
   List videoItems = <VideoItem>[];//List of video Items
   final Future<String> _calculation = Future<String>.delayed(
-    const Duration(seconds: 2),
+    const Duration(seconds: 4),
         () => 'Data Loaded',
   );
 
@@ -272,11 +272,11 @@ class _PlayListPlayerPage extends State<PlayListPlayerPage>  with AutomaticKeepA
                   child:  AspectRatio(
                     aspectRatio: 16 / 9,
                     child: bpd.BetterPlayerPlaylist(
-                        betterPlayerConfiguration: BetterPlayerConfiguration(autoPlay: true, autoDispose: true),
+                        betterPlayerConfiguration: const BetterPlayerConfiguration(autoPlay: true, autoDispose: true, placeholderOnTop: false),
                         betterPlayerPlaylistConfiguration: const BetterPlayerPlaylistConfiguration(
                           loopVideos: true,
                           autoPlay: true,
-                          nextVideoDelay: Duration(seconds: 1),
+                          nextVideoDelay: Duration(seconds: 3),
                         ),
                         betterPlayerDataSourceList: dataSourceList as List<BetterPlayerDataSource>),
                   ),

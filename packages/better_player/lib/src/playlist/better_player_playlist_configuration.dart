@@ -9,7 +9,8 @@ class BetterPlayerPlaylistConfiguration {
   ///Should videos be autoplayed
   final bool autoPlay;
 
-
+  ///Time to hide controls
+  final Duration controlsHideTime;
 
   ///Index of video that will start on playlist start. Id must be less than
   ///elements in data source list. Default is 0.
@@ -17,6 +18,7 @@ class BetterPlayerPlaylistConfiguration {
 
   const BetterPlayerPlaylistConfiguration({
     this.nextVideoDelay = const Duration(milliseconds: 3000),
+    this.controlsHideTime = const Duration(milliseconds: 300),
     this.loopVideos = true,
     this.initialStartIndex = 0,
     this.autoPlay = true,

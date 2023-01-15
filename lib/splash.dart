@@ -120,95 +120,106 @@ class _SplashState extends State<Splash> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
 
-         // FutureBuilder(
-         //
-         //      future: _getData(), // a previously-obtained Future<String> or null
-         //      builder: (BuildContext context, AsyncSnapshot snapshot) {
-         //        if (snapshot.connectionState == ConnectionState.done) {
-         //          List<Widget> children;
-         //          if (_isDownloading){
-         //            children = <Widget>[
-         //        ElevatedButton(
-         //        onPressed: () {
-         //        Navigator.push(
-         //        context,
-         //        MaterialPageRoute(
-         //        builder: (context) =>  const PlayListPlayerPage(),
-         //        ),
-         //        );
-         //        },
-         //        child: const Text('Go to My Videos'),
-         //
-         //        ),
-         //
-         //            ];
-         //          } else if (ActiveConnection == false) {
-         //            children = <Widget>[
-         //              const Icon(
-         //                Icons.error_outline,
-         //                color: Colors.red,
-         //                size: 60,
-         //              ),
-         //              Padding(
-         //                padding: const EdgeInsets.only(top: 16),
-         //                child: CheckUserConnection().toString() == "true"
-         //                    ? Text('Error: $T')
-         //                    : Text('Error: $T'),
-         //              ),
-         //            ];
-         //          } else {
-         //            children = const <Widget>[
-         //              SizedBox(
-         //                width: 60,
-         //                height: 60,
-         //                child: CircularProgressIndicator(),
-         //              ),
-         //              Padding(
-         //                padding: EdgeInsets.only(top: 16),
-         //                child: Text('Downloading Videos...'),
-         //              ),
-         //            ];
-         //          }
-         //          return Center(
-         //            child: Column(
-         //              mainAxisAlignment: MainAxisAlignment.center,
-         //
-         //              children: children,
-         //            ),
-         //          );
-         //        } else {
-         //          return const CircularProgressIndicator();
-         //        }
-         //      },
-            //)
-            FutureBuilder(
-              future: Future.wait(savedVideolist), // function that returns a Future
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.done && _isDownloading == true) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>  const PlayListPlayerPage(),
-                        ),
-                      );
-                    },
-                    child: const Text('Go to My Videos'),
+         FutureBuilder(
 
+        future: Future.wait(savedVideolist), // function that returns a Future
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                  List<Widget> children;
+                  if (ActiveConnection == false){
+                    children = <Widget>[
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 100,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 30),
+                        child: CheckUserConnection().toString() == "true"
+                            ? Text('Error: $T')
+                            : Text('Error: $T'),
+                      ),
+
+
+                    ];
+                  // } else
+                  //   if (_isDownloading) {
+                  //   children = <Widget>[
+                  //       ElevatedButton(
+                  //       onPressed: () {
+                  //       Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //       builder: (context) =>  const PlayListPlayerPage(),
+                  //       ),
+                  //       );
+                  //       },
+                  //     child: const Text('Go to My Videos'),
+                  //
+                  //     ),
+                  //   ];
+                  } else {
+                    children = const <Widget>[
+
+                      SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: CircularProgressIndicator(),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Text('Downloading videos please be patient...'),
+                      ),
+                    ];
+                  }
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+
+                      children: children,
+                    ),
                   );
                 } else {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Files are downloading...'),
-                      CircularProgressIndicator(),
-                    ],
-                  );
-
-                }
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Text('Downloading videos please be patient...'),
+                    ),
+                    CircularProgressIndicator(),
+                  ],
+                );}
               },
             )
+            // FutureBuilder(
+            //   future: Future.wait(savedVideolist), // function that returns a Future
+            //   builder: (BuildContext context, AsyncSnapshot snapshot) {
+            //     if (snapshot.connectionState == ConnectionState.done && _isDownloading == true) {
+            //       return ElevatedButton(
+            //         onPressed: () {
+            //           Navigator.push(
+            //             context,
+            //             MaterialPageRoute(
+            //               builder: (context) =>  const PlayListPlayerPage(),
+            //             ),
+            //           );
+            //         },
+            //         child: const Text('Go to My Videos'),
+            //
+            //       );
+            //     } else {
+            //       return Column(
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           Text('Files are downloading...'),
+            //           CircularProgressIndicator(),
+            //         ],
+            //       );
+            //
+            //     }
+            //   },
+            // )
 
 
 
@@ -220,6 +231,22 @@ class _SplashState extends State<Splash> {
       ),
     );
   }
+
+  Widget _buildVideoPlaceholder() {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>  const PlayListPlayerPage(),
+          ),
+        );
+      },
+      child: const Text('Go to My Videos'),
+
+    );
+  }
+
 
   Future<void> createFolders({required String type}) async {
     // await CreateFolder().betterExampleFolderExistence();
@@ -260,6 +287,8 @@ class _SplashState extends State<Splash> {
 
     }
     await saveVideo();
+    await allVideosSaved();
+
 
   }
 
@@ -269,10 +298,25 @@ class _SplashState extends State<Splash> {
         //saveVideoInGallery(videoUrl.videoUrl.toString());
         savedVideolist.add(saveVideoInGallery(_videos![i].videoUrl.toString()));
       }
-      _isDownloading = false;
+      _isDownloading = true;
 
-    _isDownloading = true;
+
     return savedVideolist;
+  }
+
+  Future<void> allVideosSaved() async {
+    await Future.wait(savedVideolist);
+    //_isDownloading = true;
+    if (_isDownloading = true) {
+      routeToVideoPlayer();
+    }
+  }
+
+  void routeToVideoPlayer() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const PlayListPlayerPage()),
+    );
   }
 
   Future<List<String>> _checkVideoAlreadySaved(String videoUrl) async {
@@ -303,6 +347,8 @@ class _SplashState extends State<Splash> {
   }
 
   Future<String> saveVideoInGallery(String videoUrl) async {
+    var videoName = videoUrl.substring(videoUrl.lastIndexOf('/') + 1);
+
     bool isVideoAlreadySavedInDevice =
     await MediaSaver().isVideoAlreadySavedInDevice(videoUrl);
 
@@ -317,7 +363,7 @@ class _SplashState extends State<Splash> {
 
       if (_isDownloading) {
         if (!mounted) return "Not mounted!";
-        GlobalSnackBar.show(context, "videos downloaded");
+        GlobalSnackBar.show(context, videoName + " downloaded");
         //_isDownloading = false;
 
 

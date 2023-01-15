@@ -48,6 +48,7 @@ class _VideoListItemState extends State<VideoListItem> {
             handleLifecycle: true,
             controlsConfiguration: BetterPlayerControlsConfiguration(
                 controlBarColor: Colors.black.withAlpha(600),
+                controlsHideTime: const Duration(seconds: 5),
                 controlBarHeight: 30,
                 overflowModalColor: Colors.yellow,
                 overflowModalTextColor: Colors.white,

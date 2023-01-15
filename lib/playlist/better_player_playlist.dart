@@ -55,13 +55,22 @@ checkVideo();
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
+    return WillPopScope(
+        onWillPop: () async {
+      Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const ListPlayerPage()),
+                    (Route<dynamic> route) => false);
+          return false;
+        },
+    child: AspectRatio(
 
       aspectRatio: _betterPlayerController!.getAspectRatio() ??
           BetterPlayerUtils.calculateAspectRatio(context),
       child: BetterPlayer(
         controller: _betterPlayerController!,
       ),
+    )
     );
   }
 
@@ -73,25 +82,42 @@ checkVideo();
       //   print('video Started');
 
 
+      if(_betterPlayerController?.videoPlayerController?.value.position == const Duration(seconds: 0, minutes: 0, hours: 0))
+      {
+        _betterPlayerController?.setControlsVisibility(false);
 
-
-      if(_betterPlayerController?.videoPlayerController?.value.position == _betterPlayerController?.videoPlayerController?.value.duration || _betterPlayerController?.videoPlayerController?.value.isPlaying == false) {
         //dispose();
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const ListPlayerPage()),
-                (Route<dynamic> route) => false);
+
         //   context,
         //   MaterialPageRoute(
         //     builder: (context) =>  const ListPlayerPage(),
         //   ),
         // );
-        print('video Ended');
+        //print('video Ended');
 
-      // // navigate to the desired route
-      // Navigator.pushNamed(context, const ListPlayerPage());
-      // print('video Ended');
-    }
+        // // navigate to the desired route
+        // Navigator.pushNamed(context, const ListPlayerPage());
+        // print('video Ended');
+      }
+
+    //   if(_betterPlayerController?.videoPlayerController?.value.position == _betterPlayerController?.videoPlayerController?.value.duration || _betterPlayerController?.videoPlayerController?.value.isPlaying == true)
+    //   {
+    //     //dispose();
+    //     Navigator.pushAndRemoveUntil(
+    //         context,
+    //         MaterialPageRoute(builder: (context) => const ListPlayerPage()),
+    //             (Route<dynamic> route) => false);
+    //     //   context,
+    //     //   MaterialPageRoute(
+    //     //     builder: (context) =>  const ListPlayerPage(),
+    //     //   ),
+    //     // );
+    //     //print('video Ended');
+    //
+    //   // // navigate to the desired route
+    //   // Navigator.pushNamed(context, const ListPlayerPage());
+    //   // print('video Ended');
+    // }
     });
     // if(betterPlayerController.betterPlayerConfiguration.autoDispose == true && (betterPlayerController.isVideoInitialized()??false)) {
     //   //betterPlayerController.videoPlayerController = null;
@@ -100,6 +126,8 @@ checkVideo();
 
 
   }
+
+
 
   // @protected
   // @mustCallSuper
