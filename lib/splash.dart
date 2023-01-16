@@ -54,7 +54,7 @@ class _SplashState extends State<Splash> {
     } on SocketException catch (_) {
       setState(() {
         ActiveConnection = false;
-        T = "Make sure you are connected to the internet and try again.";
+        T = "Make sure you are connected to the internet, restart the app and try again.";
       });
     }
   }
@@ -124,7 +124,7 @@ class _SplashState extends State<Splash> {
 
         future: Future.wait(savedVideolist), // function that returns a Future
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.connectionState == ConnectionState.done && ActiveConnection == false) {
                   List<Widget> children;
                   if (ActiveConnection == false){
                     children = <Widget>[
@@ -307,7 +307,7 @@ class _SplashState extends State<Splash> {
   Future<void> allVideosSaved() async {
     await Future.wait(savedVideolist);
     //_isDownloading = true;
-    if (_isDownloading = true) {
+    if (_isDownloading = true && savedVideolist.isNotEmpty) {
       routeToVideoPlayer();
     }
   }
